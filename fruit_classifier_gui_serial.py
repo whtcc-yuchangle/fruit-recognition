@@ -30,7 +30,7 @@ UNKNOWN_ID = 9
 class FruitClassifierApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('水果分类器 - 串口版')
+        self.setWindowTitle('水果分类检测V1.0（人工智能学院上课学习使用）')
         self.setGeometry(100, 100, 900, 700)
 
         model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'model', 'best.pt')
@@ -42,6 +42,19 @@ class FruitClassifierApp(QMainWindow):
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout()
         central_widget.setLayout(main_layout)
+
+        # --- 顶部 Logo 区域 ---
+        header_layout = QHBoxLayout()
+        logo_width = 224
+        self.logo_label = QLabel()
+        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
+        if os.path.exists(logo_path):
+            logo_pixmap = QPixmap(logo_path)
+            scaled_logo = logo_pixmap.scaledToWidth(logo_width, Qt.SmoothTransformation)
+            self.logo_label.setPixmap(scaled_logo)
+        header_layout.addWidget(self.logo_label)
+        header_layout.addStretch()
+        main_layout.addLayout(header_layout, 0)
 
         # --- 图片显示区域 ---
         self.image_label = QLabel()
