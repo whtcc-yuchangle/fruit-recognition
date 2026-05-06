@@ -4,17 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-A fruit classification system using a pre-trained YOLOv8 classification model (`model/best.pt`). It has two modes: CLI batch classification and a PyQt5 GUI app. Class names come directly from the YOLO model's internal `names` mapping.
+A fruit classification system using a pre-trained YOLOv8 classification model (`model/best.pt`). It has three modes: CLI batch classification, a PyQt5 GUI app, and a serial-communication GUI for STM32. Class names come directly from the YOLO model's internal `names` mapping.
 
 ## Commands
 
 Use the conda environment Python interpreter for all Python commands.
 
 ```bash
-PYTHON="D:/miniconda3/envs/yolo/python.exe"
+PYTHON="D:/miniconda3/envs/PyTorch/python.exe"
 
 # GUI app
 $PYTHON fruit_classifier_gui.py
+
+# GUI app with serial communication (STM32)
+$PYTHON fruit_classifier_gui_serial.py
 
 # CLI: classify all images in fruit/ → out/<class_name>/
 $PYTHON classify_fruits.py
@@ -33,8 +36,10 @@ No test suite, build step, or linter is configured.
 
 **GUI (`fruit_classifier_gui.py`)**: Single-window PyQt5 app (`FruitClassifierApp`). Workflow: user selects an image via file dialog → clicks "检测" (Detect) → model runs inference → PIL annotates the image → result is saved to a temp file and displayed. Sets `YOLO_OFFLINE` and `ULTRALYTICS_OFFLINE` env vars at module level to prevent network calls.
 
+**GUI Serial (`fruit_classifier_gui_serial.py`)**: Extended version with serial port communication for STM32. Adds serial config UI (port, baud rate, data bits, parity, stop bits). Layout: image area (top), serial config (bottom-left), detect buttons (bottom-right). After detection, sends 7-byte fixed-length message `class:<id>` (no terminator). Class mapping: apple→0, banana→1, orange→2, grape→3, unknown→9. Serial config and detect groups use `QSizePolicy.Fixed` vertical policy with image area taking all remaining space via stretch factor 1.
+
 **CLI (`classify_fruits.py`)**: Iterates over all `.jpg` files in `fruit/`, runs inference, annotates, and saves each to `out/<class_name>/<filename>`. Creates output subdirectories on demand.
 
-**Dependencies**: `torch`, `ultralytics`, `PyQt5`, `Pillow` (PIL), `numpy` (used by the GUI but only for the import — no direct array manipulation).
+**Dependencies**: `torch`, `ultralytics`, `PyQt5`, `Pillow` (PIL), `numpy`, `pyserial`.
 
 **`.gitignore`**: Ignores `.idea/` and `.claude/`. The `out/` directory is not in `.gitignore` but is output-only.
